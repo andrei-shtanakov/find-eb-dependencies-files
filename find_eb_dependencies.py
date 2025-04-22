@@ -34,17 +34,44 @@ def parse_eb_file(file_path):
         print(f"Error parsing {file_path}: {e}")
         return []
 
+def extract_module_base(module_full_name):
+    """Extract module name and version without toolchain.
+    E.g., 'util-linux/2.39-GCCcore-12.3.0' becomes 'util-linux/2.39'
+    """
+    parts = module_full_name.split('/')
+    if len(parts) != 2:
+        return module_full_name  # Return original if it doesn't match expected format
+    
+    name = parts[0]
+    version_parts = parts[1].split('-')
+    
+    # Either use the first part of version or join all parts up to the toolchain
+    # For example, '2.39-GCCcore-12.3.0' -> '2.39'
+    base_version = version_parts[0]
+    
+    # For special cases like SciPy-bundle/2023.07-gfbf-2023a, keep more of the version
+    if 'gfbf' in parts[1] or 'foss' in parts[1] or 'intel' in parts[1]:
+        # These are special stack identifiers, not toolchain versions
+        base_version = '-'.join(version_parts[:2])
+    
+    return f"{name}/{base_version}"
+
 def main():
     # Read the list of modules to search for
     with open('missed_modules.txt', 'r') as f:
-        modules_to_find = [line.strip() for line in f if line.strip()]
+        modules_to_find_full = [line.strip() for line in f if line.strip()]
+    
+    # Convert to base module names (without toolchain)
+    modules_to_find_base = [extract_module_base(m) for m in modules_to_find_full]
+    # Create mapping between base names and full names
+    base_to_full = {base: full for base, full in zip(modules_to_find_base, modules_to_find_full)}
     
     # Read the list of easyconfig files to search in
     with open('full_path_eb_files.txt', 'r') as f:
         eb_files = [line.strip() for line in f if line.strip()]
     
     # Dictionary to store the results: module -> list of eb files that define it
-    found_modules = {module: [] for module in modules_to_find}
+    found_modules = {module: [] for module in modules_to_find_full}
     
     # Process each easyconfig file
     for eb_file in eb_files:
@@ -57,11 +84,13 @@ def main():
         
         # Extract dependencies from the file
         dependencies = parse_eb_file(eb_file)
+        # Convert dependencies to base module names
+        dependencies_base = [extract_module_base(d) for d in dependencies]
         
         # Check if any of the dependencies match the modules we're looking for
-        for module in modules_to_find:
-            if module in dependencies:
-                found_modules[module].append(filename)
+        for base_module, full_module in zip(modules_to_find_base, modules_to_find_full):
+            if base_module in dependencies_base:
+                found_modules[full_module].append(filename)
     
     # Output the results
     print("\nResults:")
