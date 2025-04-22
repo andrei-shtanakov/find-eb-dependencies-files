@@ -1,0 +1,17 @@
+util-linux/2.39-GCCcore-12.3.0
+GLib/2.77.1-GCCcore-12.3.0
+hypothesis/6.82.0-GCCcore-12.3.0
+SciPy-bundle/2023.07-gfbf-2023a
+LLVM/16.0.6-GCCcore-12.3.0
+nettle/3.9.1-GCCcore-12.3.0
+libdrm/2.4.115-GCCcore-12.3.0
+Mesa/23.1.4-GCCcore-12.3.0
+libGLU/9.0.3-GCCcore-12.3.0
+GObject-Introspection/1.76.1-GCCcore-12.3.0
+Pango/1.50.14-GCCcore-12.3.0
+GTK3/3.24.37-GCCcore-12.3.0
+ICU/73.2-GCCcore-12.3.0
+Boost/1.82.0-GCC-12.3.0
+libyaml/0.2.5-GCCcore-12.3.0
+Ruby/3.3.0-GCCcore-12.3.0
+LittleCMS/2.15-GCCcore-12.3.0
